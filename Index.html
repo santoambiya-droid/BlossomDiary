@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blossom Diary — JLPT Dashboard</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Pro Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Poppins', 'Noto Sans Bengali', 'Noto Sans JP', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .lang-bn { font-family: 'Noto Sans Bengali', sans-serif; }
+        .lang-jp { font-family: 'Noto Sans JP', sans-serif; }
+
+        /* Mobile App Glassmorphism Styling Profiles */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .dark .glass-nav {
+            background: rgba(15, 15, 22, 0.85);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+        .dark .glass-card {
+            background: rgba(28, 28, 40, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* Prevent Layout Shifts & Optimize Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #FFB7B2; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF8B94; }
+    </style>
+
+    <script>
+        // Custom App Color Framework Configuration
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        sakura: {
+                            50: '#FFF5F5',
+                            100: '#FFE3E2',
+                            200: '#FFC7C4',
+                            300: '#FFB7B2',
+                            400: '#FF9E99',
+                            500: '#FF8B94',
+                            950: '#260F11'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-sakura-50 via-white to-sakura-100 dark:from-gray-950 dark:via-gray-900 dark:to-sakura-950 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-300 pb-16">
+
+    <!-- Welcome Popup Component Modal -->
+    <div id="welcome-popup" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-card max-w-sm w-full rounded-3xl p-6 text-center shadow-2xl scale-95 transition-transform duration-300 transform" id="popup-content">
+            <div class="text-4xl mb-3 animate-bounce">🌸</div>
+            <h3 class="text-xl font-bold mb-1">Welcome to Blossom Diary</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-6">Learn Japanese with interactive structured practice modules.</p>
+            <div class="flex flex-col gap-2.5">
+                <a href="https://facebook.com" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition text-xs shadow-sm">
+                    <i class="fa-brands fa-facebook text-sm"></i> Follow Facebook Page
+                </a>
+                <button onclick="closePopup()" class="w-full bg-sakura-500 hover:bg-sakura-600 text-white font-semibold py-3 px-4 rounded-xl transition text-xs shadow-md">
+                    Start Learning
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Sticky Navigation Bar -->
+    <header class="sticky top-0 z-40 w-full glass-nav border-b border-sakura-100 dark:border-gray-800/60 transition-all shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+            <!-- Brand Identity -->
+            <a href="#" class="flex items-center gap-2.5 group">
+                <div class="w-9 h-9 bg-sakura-300 dark:bg-sakura-500/20 rounded-xl flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition-transform">
+                    🌸
+                </div>
+                <div>
+                    <span class="font-bold text-base block leading-none tracking-wide text-sakura-950 dark:text-sakura-100">Blossom Diary</span>
+                    <span class="text-[10px] text-gray-400 dark:text-gray-500 font-medium">Learning Dashboard</span>
+                </div>
+            </a>
+
+            <!-- System Theme Engine -->
+            <button id="theme-toggle" class="w-10 h-10 rounded-xl bg-white/90 dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-amber-400 shadow-sm active:scale-95 transition" aria-label="Toggle Night Mode">
+                <i id="theme-icon" class="fa-solid fa-moon text-base"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- App Content Wrapper -->
+    <main class="max-w-md mx-auto px-4 pt-6 space-y-6">
+
+        <!-- ================= JLPT LEVEL SELECTOR ENGINE ================= -->
+        <section class="space-y-3">
+            <h2 class="text-xs font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase ml-1">JLPT Training Levels</h2>
+            <div class="space-y-4">
+                
+                <!-- Level N5 Card Node -->
+                <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex items-center justify-between gap-4 border-l-4 border-blue-500 group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-500 flex items-center justify-center text-xl font-bold">
+                            📘
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base tracking-tight text-gray-900 dark:text-white">JLPT N5</h3>
+                            <p class="text-xs text-gray-400 dark:text-gray-400">Beginner Level Japanese Practice</p>
+                        </div>
+                    </div>
+                    <a href="N5/index.html" class="bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm shadow-blue-500/20 whitespace-nowrap active:scale-95 transition flex items-center gap-1">
+                        Open N5 <i class="fa-solid fa-angle-right text-[10px]"></i>
+                    </a>
+                </div>
+
+                <!-- Level N4 Card Node -->
+                <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex items-center justify-between gap-4 border-l-4 border-emerald-500 group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-500 flex items-center justify-center text-xl font-bold">
+                            📗
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base tracking-tight text-gray-900 dark:text-white">JLPT N4</h3>
+                            <p class="text-xs text-gray-400 dark:text-gray-400">Elementary Level Japanese Practice</p>
+                        </div>
+                    </div>
+                    <a href="N4/index.html" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm shadow-emerald-500/20 whitespace-nowrap active:scale-95 transition flex items-center gap-1">
+                        Open N4 <i class="fa-solid fa-angle-right text-[10px]"></i>
+                    </a>
+                </div>
+
+                <!-- Level N3 Card Node -->
+                <div class="glass-card rounded-2xl p-5 opacity-70 transition-all flex items-center justify-between gap-4 border-l-4 border-rose-400 bg-gray-50/20">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/20 text-rose-400 flex items-center justify-center text-xl font-bold grayscale">
+                            📕
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base tracking-tight text-gray-400 dark:text-gray-500">JLPT N3</h3>
+                            <p class="text-xs text-gray-400 dark:text-gray-500">Intermediate Level Japanese Practice</p>
+                        </div>
+                    </div>
+                    <span class="bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-semibold text-[10px] py-1.5 px-3 rounded-lg uppercase tracking-wide">
+                        Coming Soon
+                    </span>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= INTEGRATED APP FEATURE STATS ================= -->
+        <section class="space-y-2.5">
+            <h2 class="text-xs font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase ml-1">Platform Resource Matrix</h2>
+            <div class="grid grid-cols-2 gap-3">
+                
+                <!-- Stat 1 -->
+                <div class="glass-card p-4 rounded-xl text-center shadow-sm flex flex-col justify-center">
+                    <span class="text-xl mb-1">💮</span>
+                    <p class="text-base font-bold text-sakura-500 leading-none">200+</p>
+                    <p class="text-[10px] text-gray-400 font-medium mt-1 uppercase tracking-wider">Kanji Core</p>
+                </div>
+                <!-- Stat 2 -->
+                <div class="glass-card p-4 rounded-xl text-center shadow-sm flex flex-col justify-center">
+                    <span class="text-xl mb-1">📖</span>
+                    <p class="text-base font-bold text-sakura-500 leading-none">500+</p>
+                    <p class="text-[10px] text-gray-400 font-medium mt-1 uppercase tracking-wider">Vocabulary</p>
+                </div>
+                <!-- Stat 3 -->
+                <div class="glass-card p-4 rounded-xl text-center shadow-sm flex flex-col justify-center">
+                    <span class="text-xl mb-1">⚡</span>
+                    <p class="text-xs font-bold text-gray-700 dark:text-gray-200 leading-tight">Grammar</p>
+                    <p class="text-[10px] text-gray-400 font-medium mt-0.5 uppercase tracking-wider">Practice Sets</p>
+                </div>
+                <!-- Stat 4 -->
+                <div class="glass-card p-4 rounded-xl text-center shadow-sm flex flex-col justify-center">
+                    <span class="text-xl mb-1">🎧</span>
+                    <p class="text-xs font-bold text-gray-700 dark:text-gray-200 leading-tight">Read & Listen</p>
+                    <p class="text-[10px] text-gray-400 font-medium mt-0.5 uppercase tracking-wider">Integrated Labs</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= DAILY CHALLENGE EVALUATION ================= -->
+        <section class="glass-card rounded-2xl p-5 border border-sakura-300/40 bg-gradient-to-br from-sakura-100/20 to-transparent dark:from-sakura-950/10 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 bg-sakura-400 text-white rounded-xl flex items-center justify-center text-lg shadow-sm animate-pulse">
+                    <i class="fa-solid fa-stopwatch"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm text-gray-900 dark:text-white">Daily JLPT Challenge</h3>
+                    <p class="text-[11px] text-gray-400">Keep up your daily tracking streak.</p>
+                </div>
+            </div>
+            <a href="quiz/index.html" class="bg-sakura-500 hover:bg-sakura-600 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition active:scale-95 whitespace-nowrap">
+                Start Quiz
+            </a>
+        </section>
+
+        <!-- ================= PREMIUM PREMIUM ADMISSIONS BANNER ================= -->
+        <section class="glass-card rounded-2xl p-5 border border-gray-900/10 dark:border-white/10 bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 dark:from-gray-900 dark:to-black text-white space-y-4 shadow-xl relative overflow-hidden">
+            <div class="absolute right-0 bottom-0 text-7xl opacity-5 pointer-events-none translate-y-4 translate-x-2">🇯🇵</div>
+            <div>
+                <span class="bg-sakura-500 text-white font-extrabold text-[9px] px-2 py-0.5 rounded uppercase tracking-wider">Admissions Live</span>
+                <h3 class="font-bold text-base mt-1.5 tracking-tight">Join JLPT Online Batch</h3>
+            </div>
+            
+            <ul class="space-y-2 text-xs text-gray-300">
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-sakura-400 text-xs"></i> Interactive Live Class Sessions</li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-sakura-400 text-xs"></i> Rigorous Practice Exercises</li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-sakura-400 text-xs"></i> Direct Target Mock Exam Prep</li>
+            </ul>
+
+            <a href="https://wa.me/your_number" target="_blank" class="w-full text-center block bg-white text-gray-950 hover:bg-sakura-100 font-bold py-3 rounded-xl text-xs transition active:scale-[0.99] shadow-md">
+                Join Now <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[10px]"></i>
+            </a>
+        </section>
+
+    </main>
+
+    <!-- System Application Footer Structure -->
+    <footer class="max-w-md mx-auto px-4 mt-12 pt-6 border-t border-sakura-200/30 dark:border-gray-800/60 text-center space-y-4 text-xs text-gray-400">
+        
+        <!-- Social Resource Access Matrix channels -->
+        <div class="flex items-center justify-center gap-4">
+            <a href="https://facebook.com" target="_blank" class="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 flex items-center justify-center shadow-sm transition" aria-label="Facebook Link"><i class="fa-brands fa-facebook-f text-sm"></i></a>
+            <a href="https://youtube.com" target="_blank" class="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 text-gray-400 hover:text-red-500 flex items-center justify-center shadow-sm transition" aria-label="YouTube Link"><i class="fa-brands fa-youtube text-sm"></i></a>
+            <a href="https://telegram.org" target="_blank" class="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 text-gray-400 hover:text-sky-500 flex items-center justify-center shadow-sm transition" aria-label="Telegram Link"><i class="fa-brands fa-telegram text-sm"></i></a>
+            <a href="mailto:contact@blossomdiary.com" class="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 text-gray-400 hover:text-sakura-500 flex items-center justify-center shadow-sm transition" aria-label="Email Link"><i class="fa-solid fa-envelope text-sm"></i></a>
+        </div>
+
+        <div class="text-[11px] font-medium tracking-wide">
+            &copy; 2026 <span class="text-sakura-500">Blossom Diary</span>. Ecosystem Dashboard Node.
+        </div>
+    </footer>
+
+    <!-- Interactive System Operations Engine Script -->
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const welcomePopup = document.getElementById('welcome-popup');
+        const popupContent = document.getElementById('popup-content');
+
+        // 1. Theme Configuration Validation
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                themeIcon.className = 'fa-solid fa-sun text-base';
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeIcon.className = 'fa-solid fa-moon text-base';
+            }
+            
+            // Execute restricted Welcome Module validation check
+            triggerWelcomePopup();
+        });
+
+        // 2. Light / Dark Interaction Engine Toggle Logic
+        themeToggleBtn.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                themeIcon.className = 'fa-solid fa-moon text-base';
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                themeIcon.className = 'fa-solid fa-sun text-base';
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // 3. Welcome Popup Restricted Handler
+        function triggerWelcomePopup() {
+            if (!sessionStorage.getItem('blossomMainPopupShown')) {
+                welcomePopup.classList.remove('hidden');
+                setTimeout(() => {
+                    welcomePopup.classList.remove('opacity-0');
+                    popupContent.classList.remove('scale-95');
+                }, 150);
+            }
+        }
+
+        function closePopup() {
+            welcomePopup.classList.add('opacity-0');
+            popupContent.classList.add('scale-95');
+            sessionStorage.setItem('blossomMainPopupShown', 'true');
+            setTimeout(() => {
+                welcomePopup.classList.add('hidden');
+            }, 300);
+        }
+    </script>
+</body>
+</html>
